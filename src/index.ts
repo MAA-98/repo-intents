@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { registerInitCommand } from './commands/init.js';
 import { registerListCommand } from './commands/list.js';
 import {registerAddCommand} from "./commands/add.js";
+import {registerRunCommand} from "./commands/run.js";
 
 /**
  * Create CLI program
@@ -17,5 +18,6 @@ program
 registerInitCommand(program);
 registerListCommand(program);
 registerAddCommand(program);
+registerRunCommand(program);
 
 program.parseAsync(process.argv);
