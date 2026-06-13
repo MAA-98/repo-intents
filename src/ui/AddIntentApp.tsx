@@ -7,7 +7,7 @@ import { Panel } from './Panel.js';
 import { SingleLineEditor } from "./components/SingleLineEditor.js";
 import { LongDescEditor } from "./components/LongDescEditor.js";
 import { AddActions } from "./AddActions.js";
-import { nextPhase, prevPhase, issueIsRelevant, type Phase } from './domain/addIntentPhases.js';
+import {nextPhase, prevPhase, issueIsRelevant, type Phase, formatIssueContext} from './domain/addIntentPhases.js';
 
 type Props = {
   workspace: Workspace;
@@ -68,14 +68,13 @@ export function AddIntentApp({ workspace }: Props) {
       </Box>
       
       <Panel flexGrow={1} borderColor={errExists ? 'red' : 'blue'}>
-        {/* TODO: Only allow continue when no warnings */}
         {phase === 'id' && (
           <SingleLineEditor
             label='1/4: ID'
             hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Quit' }
             value={draft.id}
             setValue={bindStringField(setDraft, 'id')}
-            onNext={() => setPhase(nextPhase)}
+            onNext={() => !errExists && setPhase(nextPhase)}
             onBack={() => setShouldExit(true)}
           />
         )}
@@ -86,7 +85,7 @@ export function AddIntentApp({ workspace }: Props) {
             hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Back' }
             value={draft.shortDesc}
             setValue={bindStringField(setDraft, 'shortDesc')}
-            onNext={() => setPhase(nextPhase)}
+            onNext={() => !errExists && setPhase(nextPhase)}
             onBack={()=> setPhase(prevPhase)}
           />
         )}
@@ -97,7 +96,7 @@ export function AddIntentApp({ workspace }: Props) {
             hint={errExists ? '⏎:New line | Esc:Back' : 'Ctrl+N: Next | ⏎:New line | Esc:Back' }
             text={draft.longDesc}
             setText={bindStringField(setDraft, 'longDesc')}
-            onSubmit={() => setPhase(nextPhase)}
+            onSubmit={() => !errExists && setPhase(nextPhase)}
             onEsc={() => setPhase(prevPhase)}
           />
         )}
@@ -105,7 +104,7 @@ export function AddIntentApp({ workspace }: Props) {
         {phase === 'actions' && (
           <AddActions
             label="4/4: Actions"
-            hint={errExists ? 'Ctrl+D:Delete Prompt | Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back' : 'Ctrl+S:Submit | Ctrl+D:Delete Prompt | Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back' }
+            hint={errExists ? 'Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back' : 'Ctrl+S:Submit | Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back' }
             actions={draft.actions}
             setActions={(next) =>
               setDraft((prev) => ({
@@ -128,7 +127,7 @@ export function AddIntentApp({ workspace }: Props) {
             <Text color="red" bold>Validation errors</Text>
             {relevantErr.map((issue, i) => (
               <Text key={`${issue.path.join('.')}-${i}`} color="red">
-                - {issue.message}
+                - {formatIssueContext(issue, phase)} {issue.message}
               </Text>
             ))}
           </Box>

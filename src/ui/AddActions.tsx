@@ -129,7 +129,12 @@ export function AddActions({ label, hint, actions, setActions, onBack, onDone }:
     <Box flexDirection="column">
       <Box flexDirection="row" justifyContent="space-between">
         <Text bold>{label}</Text>
-        {hint && <Text dimColor>{hint}</Text>}
+        {hint &&
+            <Text dimColor>
+              {(activeIndex < commandIndex) &&'Ctrl+D:Delete Prompt | '}
+              {hint}
+            </Text>
+        }
       </Box>
       
       <Box flexDirection="column">
