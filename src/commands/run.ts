@@ -10,7 +10,7 @@ async function collectPromptValues(prompts: { varName: string; prompt: string }[
   
   try {
     for (const item of prompts) {
-      const answer = await rl.question(`${item.prompt} `);
+      const answer = await rl.question(`\x1b[32m${item.prompt}\x1b[0m `);
       values[item.varName] = answer;
     }
   } finally {
