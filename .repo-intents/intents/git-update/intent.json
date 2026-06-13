@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "shortDesc": "Adds all local changes in repository, commits and pushes.",
-  "longDesc": "Use for easy submission of all current changes to all relevant git repos.",
+  "shortDesc": "Updating local changes everywhere.",
+  "longDesc": "Updating all changes currently in git repository, commiting local and remote.",
   "actions": [
     {
       "desc": "",
@@ -12,7 +12,7 @@
             "prompt": "Commit message?"
           }
         ],
-        "command": "git add -A;git commit -m \"$commit_msg\";git push;"
+        "command": "git add -A;git commit -m \"$commit_msg\";git push"
       }
     }
   ]
