@@ -1,4 +1,4 @@
-import { Intent } from "../../domain/intent.js";
+import { CURRENT_INTENT_SCHEMA_VERSION, Intent } from "../../domain/intent.js";
 
 /**
  * Creates an intentionally incomplete draft object for the TUI.
@@ -14,6 +14,7 @@ import { Intent } from "../../domain/intent.js";
  */
 export function createIntentDraft(): Intent {
   return {
+    schemaVersion: CURRENT_INTENT_SCHEMA_VERSION,
     id: '',
     shortDesc: '',
     longDesc: '',

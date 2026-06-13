@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "shortDesc": "Adds all local changes in repository, commits and pushes.",
+  "longDesc": "Use for easy submission of all current changes to all relevant git repos.",
+  "actions": [
+    {
+      "desc": "",
+      "step": {
+        "prompts": [
+          {
+            "varName": "commit_msg",
+            "prompt": "Commit message?"
+          }
+        ],
+        "command": "git add -A;git commit -m \"$commit_msg\";git push;"
+      }
+    }
+  ]
+}

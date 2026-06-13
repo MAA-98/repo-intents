@@ -1,6 +1,6 @@
 import {useMemo, useState, useEffect, type Dispatch, type SetStateAction} from "react";
 import { Box, Text, useApp } from 'ink';
-import type { Workspace } from '../domain/workspace.js';
+import { saveIntentToWorkspace, type Workspace } from '../domain/workspace.js';
 import {Intent, IntentSchema} from '../domain/intent.js';
 import { createIntentDraft } from "./domain/intentDraft.js";
 import { Panel } from './Panel.js';
@@ -32,16 +32,24 @@ function bindStringField(
   };
 }
 
+type ExitState = {
+  shouldExit: boolean;
+  message?: string
+}
+
 export function AddIntentApp({ workspace }: Props) {
   // ----- Editing Steps -----
   const [phase, setPhase] = useState<Phase>('id');
   const { exit } = useApp();
-  const [shouldExit, setShouldExit] = useState(false);
+  // Need exit state to have a single step to render before quiting app:
+  const [exitState, setExitState] = useState<ExitState>({
+    shouldExit: false,
+  });
   useEffect(() => {
-    if (shouldExit) {
+    if (exitState.shouldExit) {
       exit();
     }
-  }, [shouldExit, exit]);
+  }, [exitState, exit]);
   
   // ----- Draft and Validation ----
   const [draft, setDraft] = useState<Intent>(() => createIntentDraft());
@@ -55,8 +63,12 @@ export function AddIntentApp({ workspace }: Props) {
   const compiledIntent = parsed.success ? parsed.data : null;
   
   // Clear screen before exiting:
-  if (shouldExit) {
-    return null;
+  if (exitState.shouldExit) {
+    if (!exitState.message) {
+      return null;
+    }
+    
+    return <Text>{exitState.message}</Text>;
   }
   
   return (
@@ -75,7 +87,7 @@ export function AddIntentApp({ workspace }: Props) {
             value={draft.id}
             setValue={bindStringField(setDraft, 'id')}
             onNext={() => !errExists && setPhase(nextPhase)}
-            onBack={() => setShouldExit(true)}
+            onBack={() => setExitState({shouldExit: true})}
           />
         )}
         
@@ -114,7 +126,19 @@ export function AddIntentApp({ workspace }: Props) {
             }
             onBack={() => setPhase(prevPhase)}
             onDone={() => {
-              console.log('done');
+              if (!compiledIntent) return;
+              
+              try {
+                saveIntentToWorkspace(workspace, compiledIntent);
+                setExitState({
+                  shouldExit: true,
+                  message: `Saved intent for "${workspace.rootDir}".`,
+                });
+              } catch (err) {
+                setExitState({
+                  shouldExit: true,
+                  message: `Failed to save intent: ${err instanceof Error ? err.message : String(err)}`,                });
+              }
             }}
           />
         )}

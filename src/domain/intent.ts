@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { ActionSchema } from './action.js';
 
+export const CURRENT_INTENT_SCHEMA_VERSION = 1;
+
 /**
  * Intent IDs are also directory names, so we keep them filesystem-friendly.
  * Give detailed messages for UI hints.
@@ -23,6 +25,7 @@ export const IntentIdSchema = z
  * This is the on-disk body.
  */
 export const IntentBodySchema = z.object({
+  schemaVersion: z.literal(CURRENT_INTENT_SCHEMA_VERSION),
   shortDesc: z.string().min(1, { message: 'Must be non-empty.' }),
   longDesc: z.string().min(1, { message: 'Must be non-empty.' }),
   actions: z.array(ActionSchema).min(1)

@@ -116,7 +116,8 @@ export function loadIntents(workspaces: Workspace[]): Intent[] {
   return [...intentsById.values()];
 }
 
-export function saveIntentToWorkspace(workspace: Workspace, id: string, body: IntentBody) {
+export function saveIntentToWorkspace(workspace: Workspace, intent: Intent) {
+  const { id, ...body } = intent;
   const intentDir = join(workspace.intentsDir, id);
   const intentPath = join(intentDir, 'intent.json');
   
