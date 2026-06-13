@@ -16,11 +16,11 @@ Then details of how to do an action are not needed in daily work on a repository
 A script can be said to do the same thing except it abstracts actions to a filename, rather than an intent.
 
 ## CLI usage
-The current commands:
+The current command arguments:
 
-- `repo-intents init`
-- `repo-intents init --global`
-- `repo-intents list`
+- `init`
+- `init --global`
+- `add`
 
 ## Implementation
 
@@ -49,6 +49,7 @@ Intents are saved at the repo-level when added like so:
 ## Design Principles for 1.x
 
 Keeping it simple:
-- actions are deterministic shell commands
-- the environment available to action steps is the immediately previous prompt inputs, there's no long-running environment over action steps. 
-This means if you want to use the output from one command in another you need to write it as one action step. I.e. *actions are not functions*, they don't return data.
+- steps are either prompts for arguments or shell commands
+- actions are sequence of prompts followed by shell command
+- output of actions can't be used for next action; there's no long-running environment over actions. 
+This means if you want to use the output from one command in another you need to write it as one action step, i.e. *actions are not functions*, they don't return data.
