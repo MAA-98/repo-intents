@@ -1,12 +1,33 @@
 import type { Command } from 'commander';
 import { spawn } from 'node:child_process';
+import { createInterface } from 'node:readline/promises';
+import { stdin as input, stdout as output } from 'node:process';
 import { resolveWorkspaces, loadIntentsFromWorkspace } from '../domain/workspace.js';
 
-function runShellCommand(command: string) {
+async function collectPromptValues(prompts: { varName: string; prompt: string }[]) {
+  const rl = createInterface({ input, output });
+  const values: Record<string, string> = {};
+  
+  try {
+    for (const item of prompts) {
+      const answer = await rl.question(`${item.prompt} `);
+      values[item.varName] = answer;
+    }
+  } finally {
+    rl.close();
+  }
+  
+  return values;
+}
+
+function runShellCommand(command: string, env: Record<string, string> = {}) {
   return new Promise<number>((resolve, reject) => {
     const child = spawn('sh', ['-lc', command], {
       stdio: 'inherit',
-      env: process.env,
+      env: {
+        ...process.env,
+        ...env,
+      },
     });
     
     child.on('error', reject);
@@ -47,12 +68,17 @@ export function registerRunCommand(program: Command) {
       console.log(intent.shortDesc);
       console.log('');
       
+      // ----- RUN ACTIONS IN INTENT -----
       for (let i = 0; i < intent.actions.length; i++) {
         const action = intent.actions[i];
         const command = action.step.command;
+        const variables =
+          action.step.prompts.length > 0
+            ? await collectPromptValues(action.step.prompts)
+            : {};
         
-        console.log(`$ ${command}`);
-        const code = await runShellCommand(command);
+        console.log(`\x1b[32mRunning:\x1b[0m ${command}`); // Green 'Running: ' text
+        const code = await runShellCommand(command, variables);
         
         if (code !== 0) {
           console.error(`Command failed with exit code ${code}`);

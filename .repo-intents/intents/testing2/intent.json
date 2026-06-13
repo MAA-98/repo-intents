@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "shortDesc": "Testing",
+  "longDesc": "Testing whether run command runs the command.",
+  "actions": [
+    {
+      "desc": "",
+      "step": {
+        "prompts": [],
+        "command": "git push"
+      }
+    }
+  ]
+}
