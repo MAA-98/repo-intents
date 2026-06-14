@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import {type Workspace, type Intent, type IntentBody, type IntentId} from '../domain/types.js';
+import type { Workspace, Intent, IntentBody, IntentId} from '../domain/types.js';
 import type {
   ValidateIntentBody,
   CreateWorkspace,

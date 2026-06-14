@@ -2,7 +2,8 @@ import type { Command } from 'commander';
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
-import type {LoadIntentFromWorkspace, ResolveWorkspaces} from "../domain/contracts.js";
+import type { LoadIntentFromWorkspace, ResolveWorkspaces } from "../domain/contracts.js";
+import { resolveIntentById } from "../application/resolve-intent.js";
 
 async function collectPromptValues(prompts: { varName: string; prompt: string }[]) {
   const rl = createInterface({ input, output });
@@ -52,22 +53,12 @@ export function registerRunCommand(
         process.exit(1);
       }
       
-      let workspace = undefined;
-      let intent = undefined;
-      
-      for (const candidate of workspaces) {
-        const loadedIntent = loadIntentFromWorkspace(candidate, id);
-        if (loadedIntent) {
-          workspace = candidate;
-          intent = loadedIntent;
-          break;
-        }
-      }
-      
-      if (!workspace || !intent) {
+      const resolvedResult = resolveIntentById(workspaces, id, loadIntentFromWorkspace);
+      if (!resolvedResult) {
         console.error(`No intent found with id "${id}".`);
         process.exit(1);
       }
+      const { workspace, intent } = resolvedResult;
 
       console.log(`Intent ${intent.id} found in ${workspace.rootDir}`);
       console.log(intent.shortDesc);

@@ -7,6 +7,7 @@ import type {
   SaveIntentToWorkspace,
   ValidateIntent
 } from "../domain/contracts.js";
+import { resolveIntentById } from "../application/resolve-intent.js";
 
 export function registerEditCommand(
   program: Command,
@@ -27,22 +28,14 @@ export function registerEditCommand(
         process.exit(1);
       }
       
-      let workspace = undefined;
-      let draft = undefined;
+      const resolvedResult = resolveIntentById(workspaces, id, loadIntentFromWorkspace);
       
-      for (const candidate of workspaces) {
-        const intent = loadIntentFromWorkspace(candidate, id);
-        if (intent) {
-          workspace = candidate;
-          draft = intent;
-          break;
-        }
-      }
-      
-      if (!workspace || !draft) {
+      if (!resolvedResult) {
         console.error(`No intent found with id "${id}".`);
         process.exit(1);
       }
+      
+      const { workspace, intent } = resolvedResult;
       
       // --- EDITOR ---
       const app = render(
@@ -50,7 +43,7 @@ export function registerEditCommand(
           workspace={workspace}
           saveIntentToWorkspace={saveIntentToWorkspace}
           validateIntent={validateIntent}
-          draft={draft}
+          draft={intent}
         />
       );
       await app.waitUntilExit();

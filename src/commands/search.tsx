@@ -7,7 +7,6 @@ export function registerSearchCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
   loadIntentsFromWorkspace: LoadIntentsFromWorkspace,
-  searchIntents: SearchIntents,
 ) {
   program
     .command('search [query]')
@@ -26,7 +25,6 @@ export function registerSearchCommand(
         <SearchIntentsApp
           intents={intents}
           initialQuery={query ?? ''}
-          search={searchIntents}
           onSelect={(intent) => {
             console.log(intent.id);
             app.unmount();
