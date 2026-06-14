@@ -21,8 +21,9 @@ The current command arguments:
 - `init`
 - `init --global`
 - `add`
-- `list`
+- `edit`
 - `run`
+- `search`
 
 ## Implementation
 
