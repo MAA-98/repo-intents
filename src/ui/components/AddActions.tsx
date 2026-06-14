@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
-import type { Action, Prompt } from '../domain/action.js';
+import type { Action, Prompt } from '../../domain/types.js';
 import { Panel } from './Panel.js';
-import { SingleLineEditor } from './components/SingleLineEditor.js';
+import { SingleLineEditor } from './SingleLineEditor.js';
 
 type Props = {
   label: string;

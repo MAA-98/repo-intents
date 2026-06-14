@@ -1,4 +1,4 @@
-import type { $ZodIssue } from 'zod/v4/core';
+import type { ValidationIssue } from '../../domain/validation.js';
 
 export const phases = ['id', 'shortDesc', 'longDesc', 'actions'] as const;
 export type Phase = (typeof phases)[number];
@@ -20,7 +20,7 @@ const phaseRoots: Record<Phase, readonly string[]> = {
   actions: ['actions'],
 };
 
-export function issueIsRelevant(issue: $ZodIssue, phase: Phase): boolean {
+export function issueIsRelevant(issue: ValidationIssue, phase: Phase): boolean {
   // Root-level issues can be shown for the active screen.
   if (issue.path.length === 0) return true;
   
@@ -28,7 +28,7 @@ export function issueIsRelevant(issue: $ZodIssue, phase: Phase): boolean {
   return phaseRoots[phase].includes(root);
 }
 
-export function formatIssueContext(issue: $ZodIssue, phase: Phase) {
+export function formatIssueContext(issue: ValidationIssue, phase: Phase): string {
   // examples:
   // actions.0.desc
   // actions.0.step.command

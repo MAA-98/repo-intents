@@ -1,9 +1,14 @@
 import type { Command } from 'commander';
 import { render } from 'ink';
-import { resolveWorkspaces } from '../domain/workspace.js';
-import { AddIntentApp } from '../ui/AddIntentApp.js';
+import type {ResolveWorkspaces, SaveIntentToWorkspace, ValidateIntent} from '../domain/contracts.js';
+import { EditIntentApp } from '../ui/EditIntentApp.js';
 
-export function registerAddCommand(program: Command) {
+export function registerAddCommand(
+  program: Command,
+  resolveWorkspaces: ResolveWorkspaces,
+  saveIntentToWorkspace: SaveIntentToWorkspace,
+  validateIntent: ValidateIntent,
+) {
   program
     .command('add')
     .description('Create a new intent in the current workspace')
@@ -16,7 +21,13 @@ export function registerAddCommand(program: Command) {
         process.exit(1);
       }
       
-      const app = render(<AddIntentApp workspace={workspace} />);
+      const app = render(
+        <EditIntentApp
+          workspace={workspace}
+          saveIntentToWorkspace={saveIntentToWorkspace}
+          validateIntent={validateIntent}
+        />
+      );
       await app.waitUntilExit();
     });
 }

@@ -1,4 +1,4 @@
-import { CURRENT_INTENT_SCHEMA_VERSION, Intent } from "../../domain/intent.js";
+import { CURRENT_INTENT_SCHEMA_VERSION, Intent } from "../../domain/types.js";
 
 /**
  * Creates an intentionally incomplete draft object for the TUI.

@@ -26,14 +26,14 @@ The current command arguments:
 
 ## Implementation
 
-Initializing `repo-intents` in a repository creates a new hidden subdirectory in the current working directory of this shape:
+Initializing with `init` in a repository creates a new hidden subdirectory in the current working directory of this shape:
 
 ```text
 .repo-intents/
   intents/
 ```
 
-The command `repo-intents init --global` does the same in the home directory. 
+The command `init --global` does the same in the home directory. 
 Note that intents are always searched through the whole parent path, with closer to the current working directory prioritized.
 Therefore, global intents can be saved when not specific to a repository, and subdirectories can have their own intents that are discoverable from any path contained within it.
 

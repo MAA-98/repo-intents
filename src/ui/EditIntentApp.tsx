@@ -1,16 +1,21 @@
 import {useMemo, useState, useEffect, type Dispatch, type SetStateAction} from "react";
 import { Box, Text, useApp } from 'ink';
-import { saveIntentToWorkspace, type Workspace } from '../domain/workspace.js';
-import {Intent, IntentSchema} from '../domain/intent.js';
+
+import type { Workspace , Intent} from '../domain/types.js';
+import type { SaveIntentToWorkspace, ValidateIntent } from '../domain/contracts.js';
+
 import { createIntentDraft } from "./domain/intentDraft.js";
-import { Panel } from './Panel.js';
+import { Panel } from './components/Panel.js';
 import { SingleLineEditor } from "./components/SingleLineEditor.js";
 import { LongDescEditor } from "./components/LongDescEditor.js";
-import { AddActions } from "./AddActions.js";
-import {nextPhase, prevPhase, issueIsRelevant, type Phase, formatIssueContext} from './domain/addIntentPhases.js';
+import { AddActions } from "./components/AddActions.js";
+import {nextPhase, prevPhase, issueIsRelevant, formatIssueContext, type Phase} from './domain/editIntentPhases.js';
 
 type Props = {
   workspace: Workspace;
+  saveIntentToWorkspace: SaveIntentToWorkspace;
+  validateIntent: ValidateIntent;
+  draft?: Intent;
 };
 
 function bindStringField(
@@ -34,10 +39,10 @@ function bindStringField(
 
 type ExitState = {
   shouldExit: boolean;
-  message?: string
+  message?: string;
 }
 
-export function AddIntentApp({ workspace }: Props) {
+export function EditIntentApp({ workspace, saveIntentToWorkspace, validateIntent, draft: startingDraft }: Props) {
   // ----- Editing Steps -----
   const [phase, setPhase] = useState<Phase>('id');
   const { exit } = useApp();
@@ -52,22 +57,21 @@ export function AddIntentApp({ workspace }: Props) {
   }, [exitState, exit]);
   
   // ----- Draft and Validation ----
-  const [draft, setDraft] = useState<Intent>(() => createIntentDraft());
-  const parsed = useMemo(
-    () => IntentSchema.safeParse(draft),
-    [draft]
+  const [draft, setDraft] = useState<Intent>(() => startingDraft ?? createIntentDraft());
+  const validation = useMemo(
+    () => validateIntent(draft),
+    [draft, validateIntent]
   );
-  const validationErr = parsed.success ? [] : parsed.error.issues;
-  const relevantErr = validationErr.filter((issue) => issueIsRelevant(issue, phase));
-  const errExists = relevantErr.length > 0;
-  const compiledIntent = parsed.success ? parsed.data : null;
+  const validationIssues = validation.ok ? [] : validation.issues;
+  const relevantIssues = validationIssues.filter((issue) => issueIsRelevant(issue, phase));
+  const errExists = relevantIssues.length > 0;
+  const compiledIntent = validation.ok ? validation.value : null;
   
-  // Clear screen before exiting:
+  // Screen before exiting:
   if (exitState.shouldExit) {
     if (!exitState.message) {
       return null;
     }
-    
     return <Text>{exitState.message}</Text>;
   }
   
@@ -75,7 +79,7 @@ export function AddIntentApp({ workspace }: Props) {
     <Box flexDirection="column">
       {/* Header */}
       <Box marginTop={1}>
-        <Text bold>New Intent </Text>
+        <Text bold>{startingDraft ? 'Edit Intent ' : 'New Intent '}</Text>
         <Text>in {workspace.rootDir}</Text>
       </Box>
       
@@ -149,7 +153,7 @@ export function AddIntentApp({ workspace }: Props) {
         {errExists ? (
           <Box flexDirection="column">
             <Text color="red" bold>Validation errors</Text>
-            {relevantErr.map((issue, i) => (
+            {relevantIssues.map((issue, i) => (
               <Text key={`${issue.path.join('.')}-${i}`} color="red">
                 - {formatIssueContext(issue, phase)} {issue.message}
               </Text>
