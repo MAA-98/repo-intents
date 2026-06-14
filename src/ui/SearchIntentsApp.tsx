@@ -1,23 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Text, useApp, useInput } from 'ink';
 import type { Intent } from '../domain/types.js';
-import { searchIntents } from '../domain/search.js';
+import {SearchIntents} from "../domain/contracts.js";
 
 type Props = {
   intents: Intent[];
   initialQuery?: string;
+  search: SearchIntents;
   onSelect?: (intent: Intent) => void;
   onExit?: () => void;
 };
 
-export function SearchIntentsApp({ intents, initialQuery = '', onSelect, onExit }: Props) {
+export function SearchIntentsApp({ intents, initialQuery = '', search, onSelect, onExit }: Props) {
   const { exit } = useApp();
   const [query, setQuery] = useState(initialQuery);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const matches = useMemo(
-    () => searchIntents(query, intents),
-    [query, intents]
+    () => search(query, intents),
+    [query, intents, search]
   );
 
   useEffect(() => {

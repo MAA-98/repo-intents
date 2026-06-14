@@ -1,12 +1,13 @@
 import type { Command } from 'commander';
 import { render } from 'ink';
-import {LoadIntentsFromWorkspace, ResolveWorkspaces} from "../domain/contracts.js";
+import {LoadIntentsFromWorkspace, ResolveWorkspaces, SearchIntents} from "../domain/contracts.js";
 import { SearchIntentsApp } from '../ui/SearchIntentsApp.js';
 
 export function registerSearchCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
   loadIntentsFromWorkspace: LoadIntentsFromWorkspace,
+  searchIntents: SearchIntents,
 ) {
   program
     .command('search [query]')
@@ -25,6 +26,7 @@ export function registerSearchCommand(
         <SearchIntentsApp
           intents={intents}
           initialQuery={query ?? ''}
+          search={searchIntents}
           onSelect={(intent) => {
             console.log(intent.id);
             app.unmount();

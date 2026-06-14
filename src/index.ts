@@ -10,7 +10,7 @@ import type {
   CreateWorkspace,
   LoadIntentFromWorkspace, LoadIntentsFromWorkspace,
   ResolveWorkspaces,
-  SaveIntentToWorkspace
+  SaveIntentToWorkspace, SearchIntents
 } from "./domain/contracts.js";
 import {
   createWorkspace,
@@ -21,6 +21,7 @@ import {
 
 import type { ValidateIntent, ValidateIntentBody } from "./domain/contracts.js";
 import { validateIntent, validateIntentBody } from "./infrastructure/zod-validators.js";
+import { searchIntents } from "./infrastructure/rank-search.js";
 
 /**
  * Create CLI program
@@ -42,6 +43,7 @@ validateIntent satisfies ValidateIntent;
 validateIntentBody satisfies ValidateIntentBody;
 const loadIntentFromWorkspace: LoadIntentFromWorkspace = loadIntentFromWorkspaceFactory(validateIntentBody);
 const loadIntentsFromWorkspace: LoadIntentsFromWorkspace = loadIntentsFromWorkspaceFactory(loadIntentFromWorkspace);
+searchIntents satisfies SearchIntents;
 
 /**
  * Command registration with dependencies.
@@ -50,6 +52,6 @@ registerInitCommand(program, createWorkspace);
 registerAddCommand(program, resolveWorkspaces, saveIntentToWorkspace, validateIntent);
 registerEditCommand(program, resolveWorkspaces, loadIntentFromWorkspace, saveIntentToWorkspace, validateIntent);
 registerRunCommand(program, resolveWorkspaces, loadIntentFromWorkspace);
-registerSearchCommand(program, resolveWorkspaces, loadIntentsFromWorkspace);
+registerSearchCommand(program, resolveWorkspaces, loadIntentsFromWorkspace, searchIntents);
 
 program.parseAsync(process.argv);

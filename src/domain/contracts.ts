@@ -18,4 +18,4 @@ export type LoadIntentsFromWorkspaceFactory = (
 
 export type SaveIntentToWorkspace = (workspace: Workspace, intent: Intent) => void;
 
-export type ScoreIntent = (query: string, intent: Intent) => number;
+export type SearchIntents = (query: string, intents: Intent[]) => Intent[];
