@@ -41,11 +41,11 @@ export async function collectPromptValues(prompts: { varName: string; prompt: st
   
   try {
     for (const item of prompts) {
-      const startedAt = Date.now();
-      console.error('[collectPromptValues] asking', item.varName, item.prompt);
+      // const startedAt = Date.now();
+      // console.error('[collectPromptValues] asking', item.varName, item.prompt);
       const answer = await rl.question(`\x1b[32m${item.prompt}\x1b[0m `);
-      console.error('[collectPromptValues] answer', item.varName, JSON.stringify(answer));
-      console.error('[collectPromptValues] elapsed', Date.now() - startedAt, 'ms');
+      // console.error('[collectPromptValues] answer', item.varName, JSON.stringify(answer));
+      // console.error('[collectPromptValues] elapsed', Date.now() - startedAt, 'ms');
       
       values[item.varName] = answer;
     }
