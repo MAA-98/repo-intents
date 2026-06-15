@@ -1,10 +1,7 @@
 import type { Command } from 'commander';
 import { render } from 'ink';
 import type {Intent} from "../domain/types.js";
-import type {
-  LoadIntentsFromWorkspace,
-  ResolveWorkspaces,
-} from "../domain/contracts.js";
+import type {LoadIntentsFromWorkspace, ResolveWorkspaces} from "../domain/contracts.js";
 import { SearchIntentsApp } from '../ui/SearchIntentsApp.js';
 import {runIntent} from "../application/run-intent.js";
 import {CreateTerminalSession, CollectPromptValues, RunShellCommand} from "../application/contracts.js";
