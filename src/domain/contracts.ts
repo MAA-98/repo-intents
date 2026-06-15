@@ -20,6 +20,5 @@ export type LoadIntentsFromWorkspaceFactory = (
 
 export type SaveIntentToWorkspace = (workspace: Workspace, intent: Intent) => void;
 
-// ---*--- OTHER ---*---
-export type CollectPromptValues = (prompts: { varName: string; prompt: string }[]) => Promise<Record<string, string>>;
-export type RunShellCommand = (command: string, env?: Record<string, string>) => Promise<number>;
+// ---*--- ACTION STEPS ---*---
+export type Prompt = { varName: string; prompt: string }

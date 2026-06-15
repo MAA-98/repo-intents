@@ -1,17 +1,22 @@
 import type { Command } from 'commander';
 import type {
-  CollectPromptValues,
   LoadIntentFromWorkspace,
   ResolveWorkspaces,
-  RunShellCommand
 } from "../domain/contracts.js";
+import type {
+  CreateTerminalSession,
+  CollectPromptValues,
+  RunShellCommand
+} from "../application/contracts.js";
 import { resolveIntentById } from "../application/resolve-intent.js";
 import {runIntent} from "../application/run-intent.js";
+import {createTerminalSession} from "../infrastructure/terminal-session.js";
 
 export function registerRunCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
   loadIntentFromWorkspace: LoadIntentFromWorkspace,
+  createTerminalSession: CreateTerminalSession,
   collectPromptValues: CollectPromptValues,
   runShellCommand: RunShellCommand,
 ) {
@@ -35,6 +40,6 @@ export function registerRunCommand(
       console.log(intent.shortDesc);
       console.log('');
 
-      await runIntent(intent, collectPromptValues, runShellCommand);
+      await runIntent(intent, createTerminalSession, collectPromptValues, runShellCommand);
     });
 }

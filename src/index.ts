@@ -22,8 +22,9 @@ import {
 import type { ValidateIntent, ValidateIntentBody } from "./domain/contracts.js";
 import { validateIntent, validateIntentBody } from "./infrastructure/zod-validators.js";
 
-import type {CollectPromptValues, RunShellCommand} from "./domain/contracts.js";
-import {collectPromptValues} from "./infrastructure/collectPromptValues.js";
+import type {CreateTerminalSession, CollectPromptValues, RunShellCommand} from "./application/contracts.js";
+import {createTerminalSession} from "./infrastructure/terminal-session.js";
+import {collectPromptValues} from "./infrastructure/collect-prompt-values.js";
 import {runShellCommand} from "./infrastructure/run-shell-cmd.js";
 
 /**
@@ -48,6 +49,7 @@ createWorkspace satisfies CreateWorkspace;
 resolveWorkspaces satisfies ResolveWorkspaces;
 saveIntentToWorkspace satisfies SaveIntentToWorkspace;
 
+createTerminalSession satisfies CreateTerminalSession;
 collectPromptValues satisfies CollectPromptValues;
 runShellCommand satisfies RunShellCommand;
 
@@ -57,7 +59,7 @@ runShellCommand satisfies RunShellCommand;
 registerInitCommand(program, createWorkspace);
 registerAddCommand(program, resolveWorkspaces, saveIntentToWorkspace, validateIntent);
 registerEditCommand(program, resolveWorkspaces, loadIntentFromWorkspace, saveIntentToWorkspace, validateIntent);
-registerRunCommand(program, resolveWorkspaces, loadIntentFromWorkspace, collectPromptValues, runShellCommand);
-registerSearchCommand(program, resolveWorkspaces, loadIntentsFromWorkspace, collectPromptValues, runShellCommand);
+registerRunCommand(program, resolveWorkspaces, loadIntentFromWorkspace, createTerminalSession, collectPromptValues, runShellCommand);
+registerSearchCommand(program, resolveWorkspaces, loadIntentsFromWorkspace, createTerminalSession, collectPromptValues, runShellCommand);
 
 program.parseAsync(process.argv);

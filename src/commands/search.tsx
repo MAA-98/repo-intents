@@ -2,18 +2,18 @@ import type { Command } from 'commander';
 import { render } from 'ink';
 import type {Intent} from "../domain/types.js";
 import type {
-  CollectPromptValues,
   LoadIntentsFromWorkspace,
   ResolveWorkspaces,
-  RunShellCommand
 } from "../domain/contracts.js";
 import { SearchIntentsApp } from '../ui/SearchIntentsApp.js';
 import {runIntent} from "../application/run-intent.js";
+import {CreateTerminalSession, CollectPromptValues, RunShellCommand} from "../application/contracts.js";
 
 export function registerSearchCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
   loadIntentsFromWorkspace: LoadIntentsFromWorkspace,
+  createTerminalSession: CreateTerminalSession,
   collectPromptValues: CollectPromptValues,
   runShellCommand: RunShellCommand,
 ) {
@@ -45,7 +45,7 @@ export function registerSearchCommand(
       await app.waitUntilExit();
       
       if (selectedIntent) {
-        await runIntent(selectedIntent, collectPromptValues, runShellCommand);
+        await runIntent(selectedIntent, createTerminalSession, collectPromptValues, runShellCommand);
       }
     });
 }
