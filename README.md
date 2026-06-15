@@ -42,7 +42,7 @@ Our first intent:
             "prompt": "Commit message?"
           }
         ],
-        "command": "git add -A;git commit -m \"$commit_msg\";git push"
+        "command": "git add -A && git commit -m \"$commit_msg\" && git push"
       }
     }
   ]
@@ -51,7 +51,7 @@ Our first intent:
 
 It has a single prompt for a commit message, which is then inserted in the shell command using standard environment variable syntax.
 
-WARNING: In the `add` interactive editor, do not write `\"` for quoting, just `"`.
+WARNING: In the `add` interactive editor, do not write `\"` for quoting in the command, just write `"`.
 
 An intent can have multiple actions, and an action can have multiple prompts but only one command.
 
