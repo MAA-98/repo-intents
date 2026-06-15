@@ -61,8 +61,8 @@ The current command arguments:
 - `rein init`
 - `rein init --global`
 - `rein add`
-- `rein edit`
-- `rein run`
+- `rein edit <intent-id>`
+- `rein run <intent-id>`
 - `rein search`
 
 ### Warning
