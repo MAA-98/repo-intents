@@ -1,12 +1,21 @@
 import type { Command } from 'commander';
 import { render } from 'ink';
-import {LoadIntentsFromWorkspace, ResolveWorkspaces, SearchIntents} from "../domain/contracts.js";
+import type {Intent} from "../domain/types.js";
+import type {
+  CollectPromptValues,
+  LoadIntentsFromWorkspace,
+  ResolveWorkspaces,
+  RunShellCommand
+} from "../domain/contracts.js";
 import { SearchIntentsApp } from '../ui/SearchIntentsApp.js';
+import {runIntent} from "../application/run-intent.js";
 
 export function registerSearchCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
   loadIntentsFromWorkspace: LoadIntentsFromWorkspace,
+  collectPromptValues: CollectPromptValues,
+  runShellCommand: RunShellCommand,
 ) {
   program
     .command('search [query]')
@@ -20,18 +29,23 @@ export function registerSearchCommand(
       }
       
       const intents = workspaces.flatMap((workspace) => loadIntentsFromWorkspace(workspace));
-
+      
+      let selectedIntent: Intent | undefined;
+      
       const app = render(
         <SearchIntentsApp
           intents={intents}
           initialQuery={query ?? ''}
           onSelect={(intent) => {
-            console.log(intent.id);
-            app.unmount();
+            selectedIntent = intent;
           }}
         />
       );
-
+      
       await app.waitUntilExit();
+      
+      if (selectedIntent) {
+        await runIntent(selectedIntent, collectPromptValues, runShellCommand);
+      }
     });
 }

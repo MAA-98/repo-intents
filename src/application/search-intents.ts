@@ -1,5 +1,4 @@
 import type { Intent } from '../domain/types.js';
-import type { SearchIntents } from "../domain/contracts.js";
 
 function normalizeText(value: string) {
   return value.toLowerCase().trim();
@@ -38,7 +37,7 @@ function scoreText(normalizedQuery: string, text: string): number {
   return 0;
 }
 
-export const searchIntents: SearchIntents = (query: string, intents: Intent[]) => {
+export const searchIntents = (query: string, intents: Intent[]) => {
   const normalizedQuery = normalizeText(query);
   if (!normalizedQuery) {
     return intents;

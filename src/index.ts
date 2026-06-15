@@ -10,7 +10,7 @@ import type {
   CreateWorkspace,
   LoadIntentFromWorkspace, LoadIntentsFromWorkspace,
   ResolveWorkspaces,
-  SaveIntentToWorkspace, SearchIntents
+  SaveIntentToWorkspace,
 } from "./domain/contracts.js";
 import {
   createWorkspace,
@@ -21,6 +21,10 @@ import {
 
 import type { ValidateIntent, ValidateIntentBody } from "./domain/contracts.js";
 import { validateIntent, validateIntentBody } from "./infrastructure/zod-validators.js";
+
+import type {CollectPromptValues, RunShellCommand} from "./domain/contracts.js";
+import {collectPromptValues} from "./infrastructure/collectPromptValues.js";
+import {runShellCommand} from "./infrastructure/run-shell-cmd.js";
 
 /**
  * Create CLI program
@@ -35,18 +39,17 @@ program
 /**
  * Composition root for dependencies.
  */
+validateIntent satisfies ValidateIntent;
+validateIntentBody satisfies ValidateIntentBody;
+
+const loadIntentFromWorkspace: LoadIntentFromWorkspace = loadIntentFromWorkspaceFactory(validateIntentBody);
+const loadIntentsFromWorkspace: LoadIntentsFromWorkspace = loadIntentsFromWorkspaceFactory(loadIntentFromWorkspace);
 createWorkspace satisfies CreateWorkspace;
 resolveWorkspaces satisfies ResolveWorkspaces;
 saveIntentToWorkspace satisfies SaveIntentToWorkspace;
-validateIntent satisfies ValidateIntent;
-validateIntentBody satisfies ValidateIntentBody;
-const loadIntentFromWorkspace: LoadIntentFromWorkspace = loadIntentFromWorkspaceFactory(validateIntentBody);
-const loadIntentsFromWorkspace: LoadIntentsFromWorkspace = loadIntentsFromWorkspaceFactory(loadIntentFromWorkspace);
 
-/**
- *
- */
-
+collectPromptValues satisfies CollectPromptValues;
+runShellCommand satisfies RunShellCommand;
 
 /**
  * Command registration with dependencies.
@@ -54,7 +57,7 @@ const loadIntentsFromWorkspace: LoadIntentsFromWorkspace = loadIntentsFromWorksp
 registerInitCommand(program, createWorkspace);
 registerAddCommand(program, resolveWorkspaces, saveIntentToWorkspace, validateIntent);
 registerEditCommand(program, resolveWorkspaces, loadIntentFromWorkspace, saveIntentToWorkspace, validateIntent);
-registerRunCommand(program, resolveWorkspaces, loadIntentFromWorkspace);
-registerSearchCommand(program, resolveWorkspaces, loadIntentsFromWorkspace);
+registerRunCommand(program, resolveWorkspaces, loadIntentFromWorkspace, collectPromptValues, runShellCommand);
+registerSearchCommand(program, resolveWorkspaces, loadIntentsFromWorkspace, collectPromptValues, runShellCommand);
 
 program.parseAsync(process.argv);

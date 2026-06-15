@@ -48,6 +48,7 @@ export function SearchIntentsApp({ intents, initialQuery = '', onSelect, onExit 
       const selected = matches[activeIndex];
       if (selected && onSelect) {
         onSelect(selected);
+        exit()
       }
       return;
     }

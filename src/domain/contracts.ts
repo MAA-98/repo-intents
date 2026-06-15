@@ -1,9 +1,11 @@
 import type { Workspace, Intent, IntentBody, IntentId} from "./types.js";
 import type { Validator } from './validation.js';
 
+// ---*--- VALIDATION ---*---
 export type ValidateIntentBody = Validator<IntentBody>;
 export type ValidateIntent = Validator<Intent>;
 
+// ---*--- WORKSPACE ---*---
 export type CreateWorkspace = (baseDir: string) => void;
 export type ResolveWorkspaces = (startDir: string) => Workspace[]; // Workspaces are returned in array, prioritizing intents from earlier workspaces.
 
@@ -18,4 +20,6 @@ export type LoadIntentsFromWorkspaceFactory = (
 
 export type SaveIntentToWorkspace = (workspace: Workspace, intent: Intent) => void;
 
-export type SearchIntents = (query: string, intents: Intent[]) => Intent[];
+// ---*--- OTHER ---*---
+export type CollectPromptValues = (prompts: { varName: string; prompt: string }[]) => Promise<Record<string, string>>;
+export type RunShellCommand = (command: string, env?: Record<string, string>) => Promise<number>;
