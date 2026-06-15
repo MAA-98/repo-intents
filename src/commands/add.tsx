@@ -1,7 +1,11 @@
 import type { Command } from 'commander';
 import { render } from 'ink';
-import type {ResolveWorkspaces, SaveIntentToWorkspace, ValidateIntent} from '../domain/contracts.js';
-import { EditIntentApp } from '../ui/EditIntentApp.js';
+import type {
+  ResolveWorkspaces,
+  SaveIntentToWorkspace,
+  ValidateIntent,
+} from '../domain/contracts.js';
+import { App } from '../ui/App.js';
 
 export function registerAddCommand(
   program: Command,
@@ -15,18 +19,23 @@ export function registerAddCommand(
     .action(async () => {
       const workspaces = resolveWorkspaces(process.cwd());
       const workspace = workspaces[0];
-      
+
       if (!workspace) {
-        console.error('No .repo-intents workspace found. Run `init` or `init --global` first.');
+        console.error(
+          'No .repo-intents workspace found. Run `init` or `init --global` first.',
+        );
         process.exit(1);
       }
       
       const app = render(
-        <EditIntentApp
-          workspace={workspace}
-          saveIntentToWorkspace={saveIntentToWorkspace}
-          validateIntent={validateIntent}
-        />
+        <App
+          initial={{
+            kind: 'editIntent',
+            workspace,
+            saveIntentToWorkspace,
+            validateIntent,
+          }}
+        />,
       );
       await app.waitUntilExit();
     });

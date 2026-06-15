@@ -1,21 +1,36 @@
-import {useMemo, useState, useEffect, type Dispatch, type SetStateAction} from "react";
-import { Box, Text, useApp } from 'ink';
+import {
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
+import { Box, Text } from 'ink';
 
-import type { Workspace , Intent} from '../domain/types.js';
-import type { SaveIntentToWorkspace, ValidateIntent } from '../domain/contracts.js';
+import type { Workspace, Intent } from '../domain/types.js';
+import type {
+  SaveIntentToWorkspace,
+  ValidateIntent,
+} from '../domain/contracts.js';
 
-import { createIntentDraft } from "./domain/intentDraft.js";
+import { createIntentDraft } from './domain/intentDraft.js';
 import { Panel } from './components/Panel.js';
-import { SingleLineEditor } from "./components/SingleLineEditor.js";
-import { LongDescEditor } from "./components/LongDescEditor.js";
-import { AddActions } from "./components/AddActions.js";
-import {nextPhase, prevPhase, issueIsRelevant, formatIssueContext, type Phase} from './domain/editIntentPhases.js';
+import { SingleLineEditor } from './components/SingleLineEditor.js';
+import { LongDescEditor } from './components/LongDescEditor.js';
+import { AddActions } from './components/AddActions.js';
+import {
+  nextPhase,
+  prevPhase,
+  issueIsRelevant,
+  formatIssueContext,
+  type Phase,
+} from './domain/editIntentPhases.js';
 
 type Props = {
   workspace: Workspace;
   saveIntentToWorkspace: SaveIntentToWorkspace;
   validateIntent: ValidateIntent;
   draft?: Intent;
+  onExit: (message?: string) => void;
 };
 
 function bindStringField(
@@ -24,11 +39,8 @@ function bindStringField(
 ): Dispatch<SetStateAction<string>> {
   return (next) => {
     setDraft((prev) => {
-      const value =
-        typeof next === 'function'
-          ? next(prev[field])
-          : next;
-      
+      const value = typeof next === 'function' ? next(prev[field]) : next;
+
       return {
         ...prev,
         [field]: value,
@@ -37,44 +49,31 @@ function bindStringField(
   };
 }
 
-type ExitState = {
-  shouldExit: boolean;
-  message?: string;
-}
-
-export function EditIntentApp({ workspace, saveIntentToWorkspace, validateIntent, draft: startingDraft }: Props) {
+export function EditIntentScreen({
+  workspace,
+  saveIntentToWorkspace,
+  validateIntent,
+  draft: startingDraft,
+  onExit,
+}: Props) {
   // ----- Editing Steps -----
   const [phase, setPhase] = useState<Phase>('id');
-  const { exit } = useApp();
-  // Need exit state to have a single step to render before quiting app:
-  const [exitState, setExitState] = useState<ExitState>({
-    shouldExit: false,
-  });
-  useEffect(() => {
-    if (exitState.shouldExit) {
-      exit();
-    }
-  }, [exitState, exit]);
-  
+
   // ----- Draft and Validation ----
-  const [draft, setDraft] = useState<Intent>(() => startingDraft ?? createIntentDraft());
+  const [draft, setDraft] = useState<Intent>(
+    () => startingDraft ?? createIntentDraft(),
+  );
   const validation = useMemo(
     () => validateIntent(draft),
-    [draft, validateIntent]
+    [draft, validateIntent],
   );
   const validationIssues = validation.ok ? [] : validation.issues;
-  const relevantIssues = validationIssues.filter((issue) => issueIsRelevant(issue, phase));
+  const relevantIssues = validationIssues.filter((issue) =>
+    issueIsRelevant(issue, phase),
+  );
   const errExists = relevantIssues.length > 0;
   const compiledIntent = validation.ok ? validation.value : null;
-  
-  // Screen before exiting:
-  if (exitState.shouldExit) {
-    if (!exitState.message) {
-      return null;
-    }
-    return <Text>{exitState.message}</Text>;
-  }
-  
+
   return (
     <Box flexDirection="column">
       {/* Header */}
@@ -82,45 +81,53 @@ export function EditIntentApp({ workspace, saveIntentToWorkspace, validateIntent
         <Text bold>{startingDraft ? 'Edit Intent ' : 'New Intent '}</Text>
         <Text>in {workspace.rootDir}</Text>
       </Box>
-      
+
       <Panel flexGrow={1} borderColor={errExists ? 'red' : 'blue'}>
         {phase === 'id' && (
           <SingleLineEditor
-            label='1/4: ID'
-            hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Quit' }
+            label="1/4: ID"
+            hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Quit'}
             value={draft.id}
             setValue={bindStringField(setDraft, 'id')}
             onNext={() => !errExists && setPhase(nextPhase)}
-            onBack={() => setExitState({shouldExit: true})}
+            onBack={() => onExit()}
           />
         )}
-        
+
         {phase === 'shortDesc' && (
           <SingleLineEditor
-            label='2/4: One Line Description'
-            hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Back' }
+            label="2/4: One Line Description"
+            hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Back'}
             value={draft.shortDesc}
             setValue={bindStringField(setDraft, 'shortDesc')}
             onNext={() => !errExists && setPhase(nextPhase)}
-            onBack={()=> setPhase(prevPhase)}
+            onBack={() => setPhase(prevPhase)}
           />
         )}
-        
+
         {phase === 'longDesc' && (
           <LongDescEditor
             label="3/4: Long Description"
-            hint={errExists ? '⏎:New line | Esc:Back' : 'Ctrl+N: Next | ⏎:New line | Esc:Back' }
+            hint={
+              errExists
+                ? '⏎:New line | Esc:Back'
+                : 'Ctrl+N: Next | ⏎:New line | Esc:Back'
+            }
             text={draft.longDesc}
             setText={bindStringField(setDraft, 'longDesc')}
             onSubmit={() => !errExists && setPhase(nextPhase)}
             onEsc={() => setPhase(prevPhase)}
           />
         )}
-        
+
         {phase === 'actions' && (
           <AddActions
             label="4/4: Actions"
-            hint={errExists ? 'Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back' : 'Ctrl+S:Submit | Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back' }
+            hint={
+              errExists
+                ? 'Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back'
+                : 'Ctrl+S:Submit | Ctrl+A:Add Prompt Above | ⏎:Next Field | Esc:Back'
+            }
             actions={draft.actions}
             setActions={(next) =>
               setDraft((prev) => ({
@@ -131,35 +138,32 @@ export function EditIntentApp({ workspace, saveIntentToWorkspace, validateIntent
             onBack={() => setPhase(prevPhase)}
             onDone={() => {
               if (!compiledIntent) return;
-              
+
               try {
                 saveIntentToWorkspace(workspace, compiledIntent);
-                setExitState({
-                  shouldExit: true,
-                  message: `Saved intent for "${workspace.rootDir}".`,
-                });
+                onExit(`Saved intent for "${workspace.rootDir}".`);
               } catch (err) {
-                setExitState({
-                  shouldExit: true,
-                  message: `Failed to save intent: ${err instanceof Error ? err.message : String(err)}`,                });
+                onExit(`Failed to save intent: ${err instanceof Error ? err.message : String(err)}`);
               }
             }}
           />
         )}
       </Panel>
-      
+
       {/* Validation Errors */}
       <Box>
         {errExists ? (
           <Box flexDirection="column">
-            <Text color="red" bold>Validation errors</Text>
+            <Text color="red" bold>
+              Validation errors
+            </Text>
             {relevantIssues.map((issue, i) => (
               <Text key={`${issue.path.join('.')}-${i}`} color="red">
                 - {formatIssueContext(issue, phase)} {issue.message}
               </Text>
             ))}
           </Box>
-          ) : compiledIntent ? (
+        ) : compiledIntent ? (
           <Text color="green">Intent is valid and ready to save</Text>
         ) : (
           <Text dimColor>Intent is incomplete</Text>

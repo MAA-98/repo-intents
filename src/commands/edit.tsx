@@ -1,6 +1,5 @@
 import type { Command } from 'commander';
 import { render } from 'ink';
-import { EditIntentApp } from '../ui/EditIntentApp.js';
 import type {
   LoadIntentFromWorkspace,
   ResolveWorkspaces,
@@ -8,6 +7,7 @@ import type {
   ValidateIntent
 } from "../domain/contracts.js";
 import { resolveIntentById } from "../application/resolve-intent.js";
+import { App } from '../ui/App.js';
 
 export function registerEditCommand(
   program: Command,
@@ -39,12 +39,15 @@ export function registerEditCommand(
       
       // --- EDITOR ---
       const app = render(
-        <EditIntentApp
-          workspace={workspace}
-          saveIntentToWorkspace={saveIntentToWorkspace}
-          validateIntent={validateIntent}
-          draft={intent}
-        />
+        <App
+          initial={{
+            kind: 'editIntent',
+            workspace,
+            saveIntentToWorkspace,
+            validateIntent,
+            draft: intent
+          }}
+        />,
       );
       await app.waitUntilExit();
     });
