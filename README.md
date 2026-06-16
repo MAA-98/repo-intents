@@ -2,6 +2,7 @@
 
 `repo-intents` is a CLI for organizing common repository actions by intent.
 It provides a consistent format to list, search, and execute reusable shell actions.
+Provides automatic prompt builder, so command options or script arguments never have to be memorized.
 
 ### Motivation
 
