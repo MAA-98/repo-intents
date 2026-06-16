@@ -1,36 +1,38 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Text, useApp, useInput } from 'ink';
-import type { Intent } from '../domain/types.js';
-import { searchIntents } from "../application/search-intents.js";
+import { Box, Text, useInput } from 'ink';
+import type { Intent } from '../../domain/types.js';
+import { SearchIntents } from '../../application/search-intents.js';
 
 type Props = {
   intents: Intent[];
   initialQuery?: string;
-  onSelect?: (intent: Intent) => void;
-  onExit?: () => void;
+  onSubmit: (intent: Intent) => void;
+  onExit: (message?: string) => void;
 };
 
-export function SearchIntentsApp({ intents, initialQuery = '', onSelect, onExit }: Props) {
-  const { exit } = useApp();
+export function SearchIntentsScreen({
+  intents,
+  initialQuery = '',
+  onSubmit,
+  onExit,
+}: Props) {
   const [query, setQuery] = useState(initialQuery);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const matches = useMemo(
-    () => searchIntents(query, intents),
-    [query, intents]
+    () => SearchIntents(query, intents),
+    [query, intents],
   );
 
   useEffect(() => {
-    setActiveIndex((i) => Math.max(0, Math.min(i, Math.max(0, matches.length - 1))));
+    setActiveIndex((i) =>
+      Math.max(0, Math.min(i, Math.max(0, matches.length - 1))),
+    );
   }, [matches.length]);
 
   useInput((input, key) => {
     if (key.escape) {
-      if (onExit) {
-        onExit();
-      } else {
-        exit();
-      }
+      onExit();
       return;
     }
 
@@ -46,9 +48,8 @@ export function SearchIntentsApp({ intents, initialQuery = '', onSelect, onExit 
 
     if (key.return) {
       const selected = matches[activeIndex];
-      if (selected && onSelect) {
-        onSelect(selected);
-        exit()
+      if (selected) {
+        onSubmit(selected);
       }
       return;
     }
@@ -100,9 +101,7 @@ export function SearchIntentsApp({ intents, initialQuery = '', onSelect, onExit 
 
       <Box marginTop={1}>
         <Text dimColor>
-          {selected
-            ? 'Enter: select | Esc: exit | ↑/↓: navigate'
-            : 'Esc: exit'}
+          {selected ? 'Enter: select | Esc: exit | ↑/↓: navigate' : 'Esc: exit'}
         </Text>
       </Box>
     </Box>

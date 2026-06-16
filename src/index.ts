@@ -35,6 +35,7 @@ import type {
 import { createTerminalSession } from './infrastructure/terminal-session.js';
 import { collectPromptValues } from './infrastructure/collect-prompt-values.js';
 import { runShellCommand } from './infrastructure/run-shell-cmd.js';
+import { AppDeps } from './ui/domain/app-deps.js';
 
 /**
  * Composition root for dependencies.
@@ -66,21 +67,23 @@ program
   .version('0.1.0');
 
 /**
+ * Marshal deps for the React App (NOT the commands).
+ */
+const appDeps: AppDeps = {
+  saveIntentToWorkspace,
+  validateIntent,
+};
+
+/**
  * Command registration with dependencies.
  */
 registerInitCommand(program, createWorkspace);
-registerAddCommand(
-  program,
-  resolveWorkspaces,
-  saveIntentToWorkspace,
-  validateIntent,
-);
+registerAddCommand(program, resolveWorkspaces, appDeps);
 registerEditCommand(
   program,
   resolveWorkspaces,
   loadIntentFromWorkspace,
-  saveIntentToWorkspace,
-  validateIntent,
+  appDeps,
 );
 registerRunCommand(
   program,
@@ -97,6 +100,7 @@ registerSearchCommand(
   createTerminalSession,
   collectPromptValues,
   runShellCommand,
+  appDeps,
 );
 
 program.parseAsync(process.argv);

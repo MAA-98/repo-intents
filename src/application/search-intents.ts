@@ -37,7 +37,7 @@ function scoreText(normalizedQuery: string, text: string): number {
   return 0;
 }
 
-export const searchIntents = (query: string, intents: Intent[]) => {
+export const SearchIntents = (query: string, intents: Intent[]) => {
   const normalizedQuery = normalizeText(query);
   if (!normalizedQuery) {
     return intents;

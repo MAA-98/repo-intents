@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { Text, useApp } from 'ink';
 
 import { Screen } from './domain/screen.js';
-import { EditIntentScreen } from './EditIntentScreen.js';
-import { SearchIntentsApp } from './SearchIntentsApp.js';
+import { IntentEditorScreen } from './screens/IntentEditorScreen.js';
+import { SearchIntentsScreen } from './screens/SearchIntentsScreen.js';
+import { AppDeps } from './domain/app-deps.js';
 
 type Props = {
   initial: Screen;
+  deps: AppDeps;
 };
 
 type ExitState = {
@@ -14,7 +16,7 @@ type ExitState = {
   message?: string;
 };
 
-export function App({ initial }: Props) {
+export function App({ initial, deps }: Props) {
   const [screen, setScreen] = useState<Screen>(initial);
   const { exit } = useApp();
   // Need exit state to have a single step to render before quiting app:
@@ -35,25 +37,29 @@ export function App({ initial }: Props) {
     return <Text>{exitState.message}</Text>;
   }
 
-  if (screen.kind === 'editIntent') {
+  if (screen.kind === 'IntentEditor') {
     return (
-      <EditIntentScreen
+      <IntentEditorScreen
         workspace={screen.workspace}
-        saveIntentToWorkspace={screen.saveIntentToWorkspace}
-        validateIntent={screen.validateIntent}
         draft={screen.draft}
+        saveIntentToWorkspace={deps.saveIntentToWorkspace}
+        validateIntent={deps.validateIntent}
         onExit={(message) => setExitState({ shouldExit: true, message })}
       />
     );
   }
 
-  if (screen.kind === 'searchIntents') {
-    return null;
-    //   <SearchIntentsApp
-    //     intents={screen.intents}
-    //     initialQuery={screen.initialQuery}
-    //     onExit={setExitState({ shouldExit: true })}
-    //   />
-    // );
+  if (screen.kind === 'SearchIntents') {
+    return (
+      <SearchIntentsScreen
+        intents={screen.intents}
+        initialQuery={screen.initialQuery}
+        onSubmit={(intent) => {
+          screen.onSubmit(intent);
+          setExitState({ shouldExit: true });
+        }}
+        onExit={(message) => setExitState({ shouldExit: true, message })}
+      />
+    );
   }
 }

@@ -6,17 +6,18 @@ import type {
   ValidateIntent,
 } from '../domain/contracts.js';
 import { App } from '../ui/App.js';
+import { AppDeps } from '../ui/domain/app-deps.js';
 
 export function registerAddCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
-  saveIntentToWorkspace: SaveIntentToWorkspace,
-  validateIntent: ValidateIntent,
+  appDeps: AppDeps,
 ) {
   program
     .command('add')
     .description('Create a new intent in the current workspace')
     .action(async () => {
+      // --- FIND WORKSPACE ---
       const workspaces = resolveWorkspaces(process.cwd());
       const workspace = workspaces[0];
 
@@ -26,15 +27,15 @@ export function registerAddCommand(
         );
         process.exit(1);
       }
-      
+
+      // --- EDITOR ---
       const app = render(
         <App
           initial={{
-            kind: 'editIntent',
+            kind: 'IntentEditor',
             workspace,
-            saveIntentToWorkspace,
-            validateIntent,
           }}
+          deps={appDeps}
         />,
       );
       await app.waitUntilExit();

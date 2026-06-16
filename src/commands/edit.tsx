@@ -4,17 +4,17 @@ import type {
   LoadIntentFromWorkspace,
   ResolveWorkspaces,
   SaveIntentToWorkspace,
-  ValidateIntent
-} from "../domain/contracts.js";
-import { resolveIntentById } from "../application/resolve-intent.js";
+  ValidateIntent,
+} from '../domain/contracts.js';
+import { resolveIntentById } from '../application/resolve-intent.js';
 import { App } from '../ui/App.js';
+import { AppDeps } from '../ui/domain/app-deps.js';
 
 export function registerEditCommand(
   program: Command,
   resolveWorkspaces: ResolveWorkspaces,
   loadIntentFromWorkspace: LoadIntentFromWorkspace,
-  saveIntentToWorkspace: SaveIntentToWorkspace,
-  validateIntent: ValidateIntent,
+  appDeps: AppDeps,
 ) {
   program
     .command('edit <id>')
@@ -22,31 +22,36 @@ export function registerEditCommand(
     .action(async (id: string) => {
       // --- FIND INTENT ---
       const workspaces = resolveWorkspaces(process.cwd());
-      
+
       if (workspaces.length === 0) {
-        console.error('No .repo-intents workspace found. Run `init` or `init --global` first.');
+        console.error(
+          'No .repo-intents workspace found. Run `init` or `init --global` first.',
+        );
         process.exit(1);
       }
-      
-      const resolvedResult = resolveIntentById(workspaces, id, loadIntentFromWorkspace);
-      
+
+      const resolvedResult = resolveIntentById(
+        workspaces,
+        id,
+        loadIntentFromWorkspace,
+      );
+
       if (!resolvedResult) {
         console.error(`No intent found with id "${id}".`);
         process.exit(1);
       }
-      
+
       const { workspace, intent } = resolvedResult;
-      
+
       // --- EDITOR ---
       const app = render(
         <App
           initial={{
-            kind: 'editIntent',
+            kind: 'IntentEditor',
             workspace,
-            saveIntentToWorkspace,
-            validateIntent,
-            draft: intent
+            draft: intent,
           }}
+          deps={appDeps}
         />,
       );
       await app.waitUntilExit();

@@ -6,24 +6,24 @@ import {
 } from 'react';
 import { Box, Text } from 'ink';
 
-import type { Workspace, Intent } from '../domain/types.js';
+import type { Workspace, Intent } from '../../domain/types.js';
 import type {
   SaveIntentToWorkspace,
   ValidateIntent,
-} from '../domain/contracts.js';
+} from '../../domain/contracts.js';
 
-import { createIntentDraft } from './domain/intentDraft.js';
-import { Panel } from './components/Panel.js';
-import { SingleLineEditor } from './components/SingleLineEditor.js';
-import { LongDescEditor } from './components/LongDescEditor.js';
-import { AddActions } from './components/AddActions.js';
+import { createIntentDraft } from '../domain/intentDraft.js';
+import { Panel } from '../components/Panel.js';
+import { SingleLineEditor } from '../components/SingleLineEditor.js';
+import { LongDescEditor } from '../components/LongDescEditor.js';
+import { AddActions } from '../components/AddActions.js';
 import {
   nextPhase,
   prevPhase,
   issueIsRelevant,
   formatIssueContext,
   type Phase,
-} from './domain/editIntentPhases.js';
+} from '../domain/editIntentPhases.js';
 
 type Props = {
   workspace: Workspace;
@@ -49,7 +49,7 @@ function bindStringField(
   };
 }
 
-export function EditIntentScreen({
+export function IntentEditorScreen({
   workspace,
   saveIntentToWorkspace,
   validateIntent,
