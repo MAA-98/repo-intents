@@ -1,7 +1,7 @@
 import { Box, Text, useApp, useInput } from 'ink';
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
-import { getCursorIndex, getCursorPosition } from '../textEditing/textMethods.js';
-import { TextEditorRender } from '../textEditing/TextEditorRender.js';
+import { getCursorIndex, getCursorPosition } from './textEditing/textMethods.js';
+import { TextEditorRender } from './textEditing/TextEditorRender.js';
 
 type Props = {
   label: string;

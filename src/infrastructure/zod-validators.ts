@@ -8,7 +8,8 @@ import {
   type IntentBody,
   type Action,
   type Prompt,
-  type ShellStep
+  type ShellStep,
+  type Workspace
 } from "../domain/types.js";
 
 // ---*--- ZOD SCHEMAS ---*---
@@ -66,7 +67,7 @@ export const IntentBodySchema = z.object({
   schemaVersion: z.literal(CURRENT_INTENT_SCHEMA_VERSION),
   shortDesc: z.string().min(1, { message: 'Must be non-empty.' }),
   longDesc: z.string().min(1, { message: 'Must be non-empty.' }),
-  actions: z.array(ActionSchema).min(1)
+  actions: z.array(ActionSchema).min(1),
 });
 
 /**
@@ -75,6 +76,7 @@ export const IntentBodySchema = z.object({
  */
 export const IntentSchema: z.ZodType<Intent> = IntentBodySchema.extend({
   id: IntentIdSchema,
+  workspace: z.any(),
 });
 
 // ---*--- VALIDATOR IMPLEMENTATION ---*---

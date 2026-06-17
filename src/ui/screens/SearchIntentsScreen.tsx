@@ -2,11 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { Intent } from '../../domain/types.js';
 import { SearchIntents } from '../../application/search-intents.js';
+import { SingleLineEditor } from '../components/SingleLineEditor.js';
+import { SearchIntentResultItem } from '../components/SearchIntentResultItem.js';
 
 type Props = {
   intents: Intent[];
   initialQuery?: string;
   onSubmit: (intent: Intent) => void;
+  onEdit: (intent: Intent) => void;
   onExit: (message?: string) => void;
 };
 
@@ -14,6 +17,7 @@ export function SearchIntentsScreen({
   intents,
   initialQuery = '',
   onSubmit,
+  onEdit,
   onExit,
 }: Props) {
   const [query, setQuery] = useState(initialQuery);
@@ -30,12 +34,8 @@ export function SearchIntentsScreen({
     );
   }, [matches.length]);
 
+  // Leave search input to SingleLineEditor
   useInput((input, key) => {
-    if (key.escape) {
-      onExit();
-      return;
-    }
-
     if (key.upArrow) {
       setActiveIndex((i) => Math.max(0, i - 1));
       return;
@@ -45,22 +45,10 @@ export function SearchIntentsScreen({
       setActiveIndex((i) => Math.min(matches.length - 1, i + 1));
       return;
     }
-
-    if (key.return) {
-      const selected = matches[activeIndex];
-      if (selected) {
-        onSubmit(selected);
-      }
+    
+    if (key.ctrl && input === 'e') {
+      if (selected) onEdit(selected);
       return;
-    }
-
-    if (key.backspace || key.delete) {
-      setQuery((value) => value.slice(0, -1));
-      return;
-    }
-
-    if (!key.ctrl && input) {
-      setQuery((value) => value + input);
     }
   });
 
@@ -68,41 +56,43 @@ export function SearchIntentsScreen({
 
   return (
     <Box flexDirection="column">
-      <Box marginBottom={1}>
+      <Box flexDirection="row" justifyContent="space-between">
         <Text bold>Search intents</Text>
+        <Text dimColor>
+          {selected
+            ? '↑/↓: navigate | Enter: run | Ctrl+E: Edit | Esc: exit'
+            : 'Esc: exit'}
+        </Text>
       </Box>
 
-      <Box marginBottom={1}>
-        <Text color="cyan">Query: </Text>
-        <Text>{query}</Text>
-        <Text inverse> </Text>
+      <Box borderStyle="round" paddingX={1} paddingY={0}>
+        <SingleLineEditor
+          prompt="Search: "
+          value={query}
+          setValue={setQuery}
+          onSubmit={() => {
+            const selected = matches[activeIndex];
+            if (selected) onSubmit(selected);
+          }}
+          onBack={onExit}
+          active={true}
+        />
       </Box>
 
       <Box flexDirection="column">
         {matches.length === 0 ? (
-          <Text dimColor>No matches</Text>
+          <Box borderStyle="round" paddingX={1} paddingY={0}>
+            <Text dimColor>No matches for “{query}”</Text>
+          </Box>
         ) : (
           matches.map((intent, index) => (
-            <Box key={intent.id} flexDirection="column" marginBottom={1}>
-              <Text color={index === activeIndex ? 'green' : undefined}>
-                {index === activeIndex ? '> ' : '  '}
-                {intent.id} — {intent.shortDesc}
-              </Text>
-
-              {index === activeIndex && (
-                <Box marginLeft={2} flexDirection="column">
-                  <Text dimColor>{intent.longDesc}</Text>
-                </Box>
-              )}
-            </Box>
+            <SearchIntentResultItem
+              key={intent.id}
+              intent={intent}
+              isSelected={index === activeIndex}
+            />
           ))
         )}
-      </Box>
-
-      <Box marginTop={1}>
-        <Text dimColor>
-          {selected ? 'Enter: select | Esc: exit | ↑/↓: navigate' : 'Esc: exit'}
-        </Text>
       </Box>
     </Box>
   );

@@ -65,12 +65,12 @@ export const resolveWorkspaces: ResolveWorkspaces = (startDir: string) => {
 }
 
 export const saveIntentToWorkspace: SaveIntentToWorkspace = (workspace: Workspace, intent: Intent) => {
-  const { id, ...body } = intent;
+  const { id, workspace: trash, ...intentBody } = intent;
   const intentDir = join(workspace.intentsDir, id);
   const intentPath = join(intentDir, 'intent.json');
   
   mkdirSync(intentDir, { recursive: true });
-  writeFileSync(intentPath, JSON.stringify(body, null, 2) + '\n', 'utf8');
+  writeFileSync(intentPath, JSON.stringify(intentBody, null, 2) + '\n', 'utf8');
   
   return intentPath;
 }
@@ -109,6 +109,7 @@ export const loadIntentFromWorkspaceFactory: LoadIntentFromWorkspaceFactory = (
     const body: IntentBody = validation.value;
     return ({
       id,
+      workspace,
       ...body
     });
   } catch (err) {

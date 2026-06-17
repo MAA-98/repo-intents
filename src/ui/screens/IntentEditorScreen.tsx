@@ -61,7 +61,7 @@ export function IntentEditorScreen({
 
   // ----- Draft and Validation ----
   const [draft, setDraft] = useState<Intent>(
-    () => startingDraft ?? createIntentDraft(),
+    () => startingDraft ?? createIntentDraft(workspace),
   );
   const validation = useMemo(
     () => validateIntent(draft),
@@ -89,7 +89,7 @@ export function IntentEditorScreen({
             hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Quit'}
             value={draft.id}
             setValue={bindStringField(setDraft, 'id')}
-            onNext={() => !errExists && setPhase(nextPhase)}
+            onSubmit={() => !errExists && setPhase(nextPhase)}
             onBack={() => onExit()}
           />
         )}
@@ -100,7 +100,7 @@ export function IntentEditorScreen({
             hint={errExists ? 'Esc:Quit' : '⏎:Continue | Esc:Back'}
             value={draft.shortDesc}
             setValue={bindStringField(setDraft, 'shortDesc')}
-            onNext={() => !errExists && setPhase(nextPhase)}
+            onSubmit={() => !errExists && setPhase(nextPhase)}
             onBack={() => setPhase(prevPhase)}
           />
         )}

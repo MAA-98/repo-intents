@@ -41,6 +41,7 @@ export type IntentBody = {
 
 export type Intent = IntentBody & {
   id: IntentId;
+  workspace: Workspace;
 };
 
 // ---*--- WORKSPACE ---*---

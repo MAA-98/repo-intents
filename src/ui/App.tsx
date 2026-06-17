@@ -58,6 +58,13 @@ export function App({ initial, deps }: Props) {
           screen.onSubmit(intent);
           setExitState({ shouldExit: true });
         }}
+        onEdit={(intent) => {
+          setScreen({
+            kind: 'IntentEditor',
+            workspace: intent.workspace,
+            draft: intent,
+          })
+        }}
         onExit={(message) => setExitState({ shouldExit: true, message })}
       />
     );

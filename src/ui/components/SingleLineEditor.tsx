@@ -2,17 +2,17 @@ import { Box, Text, useApp, useInput } from 'ink';
 
 type Props = {
   flexGrow?: number;
-  label: string,
+  label?: string,
   hint?: string;
   prompt?: string;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
-  onNext: () => void;
+  onSubmit: () => void;
   onBack?: () => void;
   active?: boolean;
 };
 
-export function SingleLineEditor({ flexGrow=0, label, hint, prompt='> ', value, setValue, onNext, onBack, active = true }: Props) {
+export function SingleLineEditor({ flexGrow=0, label, hint, prompt='> ', value, setValue, onSubmit, onBack, active = true }: Props) {
   const { exit } = useApp();
   
   useInput((input, key) => {
@@ -20,7 +20,7 @@ export function SingleLineEditor({ flexGrow=0, label, hint, prompt='> ', value, 
     
     switch (true) {
       case key.return:
-        onNext();
+        onSubmit();
         break;
       
       case key.escape:
@@ -43,10 +43,13 @@ export function SingleLineEditor({ flexGrow=0, label, hint, prompt='> ', value, 
   
   return (
     <Box flexDirection="column" flexGrow={flexGrow}>
-      <Box flexDirection="row" justifyContent="space-between">
-        <Text bold>{label}</Text>
-        {hint && <Text dimColor>{hint}</Text>}
-      </Box>
+      
+      {(label || hint) && (
+        <Box flexDirection="row" justifyContent="space-between">
+          <Text bold>{label}</Text>
+          {hint && <Text dimColor>{hint}</Text>}
+        </Box>
+      )}
       
       <Box>
         <Text>

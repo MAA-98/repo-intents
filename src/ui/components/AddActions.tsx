@@ -160,7 +160,7 @@ export function AddActions({ label, hint, actions, setActions, onBack, onDone }:
                       }));
                     }}
                     active={activeIndex === index * 2}
-                    onNext={() => setActiveIndex(Math.min(2 * index + 1, commandIndex))}
+                    onSubmit={() => setActiveIndex(Math.min(2 * index + 1, commandIndex))}
                     onBack={onBack}
                   />
                 </Box>
@@ -182,7 +182,7 @@ export function AddActions({ label, hint, actions, setActions, onBack, onDone }:
                       }));
                     }}
                     active={activeIndex === index * 2 + 1}
-                    onNext={() => setActiveIndex(Math.min(2 * index + 2, commandIndex))}
+                    onSubmit={() => setActiveIndex(Math.min(2 * index + 2, commandIndex))}
                     onBack={onBack}
                   />
                 </Box>
@@ -204,7 +204,7 @@ export function AddActions({ label, hint, actions, setActions, onBack, onDone }:
               updateCommand(value);
             }}
             active={activeIndex === commandIndex}
-            onNext={onDone}
+            onSubmit={onDone}
             onBack={onBack}
           />
         </Panel>
