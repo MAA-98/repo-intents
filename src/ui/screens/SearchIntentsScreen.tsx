@@ -60,8 +60,8 @@ export function SearchIntentsScreen({
         <Text bold>Search intents</Text>
         <Text dimColor>
           {selected
-            ? '↑/↓: navigate | Enter: run | Ctrl+E: Edit | Esc: exit'
-            : 'Esc: exit'}
+            ? '↑/↓:Navigate | Enter:Run | Ctrl+E:Edit | Esc:Exit'
+            : 'Esc:Exit'}
         </Text>
       </Box>
 
