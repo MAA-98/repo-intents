@@ -8,6 +8,7 @@ import { Box, Text } from 'ink';
 
 import type { Workspace, Intent } from '../../domain/types.js';
 import type {
+  DeleteIntentFromWorkspace,
   SaveIntentToWorkspace,
   ValidateIntent,
 } from '../../domain/contracts.js';
@@ -24,11 +25,13 @@ import {
   formatIssueContext,
   type Phase,
 } from '../domain/editIntentPhases.js';
+import { start } from 'node:repl';
 
 type Props = {
   workspace: Workspace;
-  saveIntentToWorkspace: SaveIntentToWorkspace;
   validateIntent: ValidateIntent;
+  saveIntentToWorkspace: SaveIntentToWorkspace;
+  deleteIntentFromWorkspace: DeleteIntentFromWorkspace;
   draft?: Intent;
   onExit: (message?: string) => void;
 };
@@ -51,8 +54,9 @@ function bindStringField(
 
 export function IntentEditorScreen({
   workspace,
-  saveIntentToWorkspace,
   validateIntent,
+  saveIntentToWorkspace,
+  deleteIntentFromWorkspace,
   draft: startingDraft,
   onExit,
 }: Props) {
@@ -140,10 +144,13 @@ export function IntentEditorScreen({
               if (!compiledIntent) return;
 
               try {
+                if (startingDraft) deleteIntentFromWorkspace(workspace, startingDraft);
                 saveIntentToWorkspace(workspace, compiledIntent);
                 onExit(`Saved intent for "${workspace.rootDir}".`);
               } catch (err) {
-                onExit(`Failed to save intent: ${err instanceof Error ? err.message : String(err)}`);
+                onExit(
+                  `Failed to save intent: ${err instanceof Error ? err.message : String(err)}`,
+                );
               }
             }}
           />

@@ -8,6 +8,7 @@ import { registerSearchCommand } from './commands/search.js';
 
 import type {
   CreateWorkspace,
+  DeleteIntentFromWorkspace,
   LoadIntentFromWorkspace,
   LoadIntentsFromWorkspace,
   ResolveWorkspaces,
@@ -15,6 +16,7 @@ import type {
 } from './domain/contracts.js';
 import {
   createWorkspace,
+  deleteIntentFromWorkspace,
   loadIntentFromWorkspaceFactory,
   loadIntentsFromWorkspaceFactory,
   resolveWorkspaces,
@@ -50,7 +52,9 @@ const loadIntentsFromWorkspace: LoadIntentsFromWorkspace =
   loadIntentsFromWorkspaceFactory(loadIntentFromWorkspace);
 createWorkspace satisfies CreateWorkspace;
 resolveWorkspaces satisfies ResolveWorkspaces;
+
 saveIntentToWorkspace satisfies SaveIntentToWorkspace;
+deleteIntentFromWorkspace satisfies DeleteIntentFromWorkspace;
 
 createTerminalSession satisfies CreateTerminalSession;
 collectPromptValues satisfies CollectPromptValues;
@@ -72,6 +76,7 @@ program
 const appDeps: AppDeps = {
   saveIntentToWorkspace,
   validateIntent,
+  deleteIntentFromWorkspace,
 };
 
 /**

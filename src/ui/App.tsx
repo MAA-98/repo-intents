@@ -42,8 +42,9 @@ export function App({ initial, deps }: Props) {
       <IntentEditorScreen
         workspace={screen.workspace}
         draft={screen.draft}
-        saveIntentToWorkspace={deps.saveIntentToWorkspace}
         validateIntent={deps.validateIntent}
+        saveIntentToWorkspace={deps.saveIntentToWorkspace}
+        deleteIntentFromWorkspace={deps.deleteIntentFromWorkspace}
         onExit={(message) => setExitState({ shouldExit: true, message })}
       />
     );
